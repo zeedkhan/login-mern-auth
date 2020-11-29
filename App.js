@@ -9,17 +9,15 @@ function App() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [password2, setPassword2] = useState("")
-
+  const [showLogin, setShowLogin] = useState(false)
+  const [nameErr, setNameErr] = useState(null)
+  const [emailErr, setEmailErr] = useState(null)
+  const [passwordErr, setPasswordErr] = useState(null)
+  const [passwordErr2, setPasswordErr2] = useState(null)
   
-  // const onInputChange = e => {
-  //   setName({[e.target.id]: e.target.value})
-  //   setEmail({[e.target.id]: e.target.value})
-  //   setPassword({[e.target.id]: e.target.value})
-  //   setPassword2({[e.target.id]: e.target.value})
-  // }
 
   const api = "http://localhost:5000"
-  
+
   const register = () => {
 
       const newUserObject = {
@@ -33,20 +31,46 @@ function App() {
       method: "POST",
       headers: {"Content-Type": "application/json"},
       body: JSON.stringify(newUserObject)})
-      .then(res => res.json()).then(json => {console.log(json)})
-
+      .then(res => {
+        if (res.status === 200) {
+          setShowLogin(true)
+        } else {
+          res.json().then(json => {
+            const {name, email, password, password2} = json;
+            setNameErr(name)
+            setEmailErr(email)
+            setPasswordErr(password)
+            setPasswordErr2(password2)
+          })
+        }
+      })
       console.log(newUserObject)
   }
 
 
   return (
     <div className="App">
-      <h1>LOGIN</h1>
-      <input type="name" id="name" onChange={e => setName(e.target.value)} />
-      <input type="email" id="email" onChange={e => setEmail(e.target.value)}/>
-      <input type="password" id="password" onChange={e => setPassword(e.target.value)}/>
-      <input type="password" id="password2" onChange={e => setPassword2(e.target.value)}/>
-      <button onClick={register}></button>
+
+      {showLogin ? ( <div> <h1>Let's login</h1></div>
+      ) : 
+    <div>
+      <form>
+        <h1>Sign Up</h1>
+      {nameErr ? nameErr : null}
+      Name: <input type="name" id="name" onChange={e => setName(e.target.value)} />
+      <br/>
+      {emailErr ? emailErr : null}
+      Email :<input type="email" id="email" onChange={e => setEmail(e.target.value)}/>
+      <br/>
+      {passwordErr ? passwordErr : null}
+      Password: <input type="password" id="password" onChange={e => setPassword(e.target.value)}/>
+      <br/>
+      {passwordErr2 ? passwordErr2 : null}
+      Confirm Password: <input type="password" id="password2" onChange={e => setPassword2(e.target.value)}/>
+      <br/>
+      <button onClick={register}>Register</button>  
+      </form>
+    </div> } 
     </div>
   );
 }
